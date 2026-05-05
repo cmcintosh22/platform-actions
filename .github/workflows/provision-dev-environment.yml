@@ -1,0 +1,82 @@
+name: Provision Dev Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      service_name:
+        description: "Name of the service to provision"
+        required: true
+        type: string
+      owning_team:
+        description: "Team that owns this service"
+        required: false
+        type: string
+      cloud_region:
+        description: "Cloud region to deploy to"
+        required: true
+        type: choice
+        options:
+          - eu-west-1
+          - us-east-1
+          - ap-southeast-1
+      environment_type:
+        description: "Environment type"
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+      port_payload:
+        description: "Port Action payload (JSON)"
+        required: false
+        type: string
+
+jobs:
+  provision:
+    name: Provision Dev Environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print Inputs
+        run: |
+          echo "========================================="
+          echo "  Provisioning Dev Environment"
+          echo "========================================="
+          echo "Service Name   : ${{ github.event.inputs.service_name }}"
+          echo "Owning Team    : ${{ github.event.inputs.owning_team }}"
+          echo "Cloud Region   : ${{ github.event.inputs.cloud_region }}"
+          echo "Environment    : ${{ github.event.inputs.environment_type }}"
+          echo "========================================="
+
+      - name: Validate Inputs
+        run: |
+          if [ -z "${{ github.event.inputs.service_name }}" ]; then
+            echo "ERROR: service_name is required"
+            exit 1
+          fi
+          echo "Input validation passed."
+
+      - name: Simulate Infrastructure Provisioning
+        run: |
+          echo ">>> [PLACEHOLDER] Provisioning infrastructure..."
+          echo ">>> Region  : ${{ github.event.inputs.cloud_region }}"
+          echo ">>> Env     : ${{ github.event.inputs.environment_type }}"
+          echo ">>> Service : ${{ github.event.inputs.service_name }}"
+          echo ""
+          echo "In a real workflow this step would:"
+          echo "  1. Authenticate to AWS or GCP or Azure"
+          echo "  2. Run Terraform or Pulumi to create the environment"
+          echo "  3. Register the environment in Port as an entity"
+          sleep 2
+          echo ">>> Provisioning complete (simulated)."
+
+      - name: Report Back to Port
+        if: always()
+        env:
+          PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
+          PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
+        run: |
+          echo ">>> [PLACEHOLDER] Reporting run status back to Port..."
+          echo "In a real workflow this step would call the Port API to"
+          echo "update the action run status and attach logs."
+          echo "Workflow finished."
